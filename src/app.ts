@@ -1,10 +1,18 @@
 import express from 'express';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { connectDB } from './config/db';
+
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
-
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN }));
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+connectDB();
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server Started on port ${process.env.PORT}`);
 });
