@@ -1,5 +1,5 @@
 {
-  "name": "ticket-api",
+  "name": "event-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.ts",
@@ -11,9 +11,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.1.0",
-    "ts-node-dev": "^2.0.0"
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "axios": "^1.11.0",
