@@ -6,6 +6,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
+    "types": ["node", "express"],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
       "@/*": ["*"]
     },
@@ -15,6 +17,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src"],
+  "include": ["src/**/*", "src/types/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
