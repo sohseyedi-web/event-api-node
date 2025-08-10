@@ -1,10 +1,9 @@
 import nodemailer from 'nodemailer';
-import JWT, { JwtPayload, SignOptions } from 'jsonwebtoken';
+import JWT, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Response, Request } from 'express';
 import { IUser } from '../types';
 import createHttpError from 'http-errors';
-import cookieParser from 'cookie-parser';
 import { UserModel } from '@/modules/user/models/user';
 dotenv.config();
 
@@ -16,99 +15,70 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-function generateToken(user: IUser, expiresIn: SignOptions, secret: string): Promise<string> {
+function generateToken(user: IUser, expiresIn: '1d' | '1y', secret: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const payload: JwtPayload = {
-      _id: user._id,
-    };
+    const payload: JwtPayload = { _id: user._id };
 
-    JWT.sign(
-      payload,
-      secret || process.env.TOKEN_SECRET_KEY!,
-      expiresIn,
-      (err: Error | null, token: string | undefined) => {
-        if (err) reject(createHttpError.InternalServerError('خطای سروری'));
-        if (!token) reject(createHttpError.InternalServerError('خطای سروری'));
-        resolve(token as string);
-      }
-    );
+    JWT.sign(payload, secret, { expiresIn }, (err, token) => {
+      if (err || !token) return reject(new Error('خطا'));
+      resolve(token);
+    });
   });
 }
 
 export async function setAccessToken(res: Response, user: IUser) {
-  const cookieOptions = {
-    maxAge: 1000 * 60 * 60 * 24 * 1, // would expire after 1 days
-    httpOnly: true, // The cookie only accessible by the web server
-    signed: true, // Indicates if the cookie should be signed
-    sameSite: 'lax' as const, // Fixed sameSite type
-    secure: process.env.NODE_ENV === 'development' ? false : true,
+  const token = await generateToken(user, '1d', process.env.ACCESS_TOKEN_SECRET_KEY!);
+
+  res.cookie('accessToken', token, {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    signed: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV !== 'development',
     domain: process.env.NODE_ENV === 'development' ? 'localhost' : '.fronthooks.ir',
-  };
-  const token = await generateToken(
-    user,
-    '1d' as SignOptions,
-    process.env.ACCESS_TOKEN_SECRET_KEY!
-  );
-  res.cookie('accessToken', token, cookieOptions);
+  });
 }
 
 export async function setRefreshToken(res: Response, user: IUser) {
-  const cookieOptions = {
-    maxAge: 1000 * 60 * 60 * 24 * 365, // would expire after 1 year
-    httpOnly: true, // The cookie only accessible by the web server
-    signed: true, // Indicates if the cookie should be signed
-    sameSite: 'lax' as const, // Fixed sameSite type
-    secure: process.env.NODE_ENV === 'development' ? false : true,
+  const token = await generateToken(user, '1y', process.env.REFRESH_TOKEN_SECRET_KEY!);
+
+  res.cookie('refreshToken', token, {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+    httpOnly: true,
+    signed: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV !== 'development',
     domain: process.env.NODE_ENV === 'development' ? 'localhost' : '.fronthooks.ir',
-  };
-  const token = await generateToken(
-    user,
-    '1y' as SignOptions,
-    process.env.REFRESH_TOKEN_SECRET_KEY!
-  );
-  res.cookie('refreshToken', token, cookieOptions);
+  });
 }
 
-export function verifyRefreshToken(req: Request) {
+export async function verifyRefreshToken(req: Request) {
   const refreshToken = req.signedCookies['refreshToken'];
   if (!refreshToken) {
     throw createHttpError.Unauthorized('لطفا وارد حساب کاربری خود شوید.');
   }
 
-  const token = cookieParser.signedCookie(refreshToken, process.env.COOKIE_PARSER_SECRET_KEY!);
+  try {
+    const payload = JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY!) as JwtPayload;
 
-  if (typeof token !== 'string') {
-    throw createHttpError.Unauthorized('توکن نامعتبر است.');
-  }
+    if (!payload || !payload._id) {
+      throw createHttpError.Unauthorized('اطلاعات توکن نامعتبر است');
+    }
 
-  return new Promise<string>((resolve, reject) => {
-    JWT.verify(token, process.env.REFRESH_TOKEN_SECRET_KEY!, async (err, payload) => {
-      try {
-        if (err) {
-          return reject(createHttpError.Unauthorized('لطفا وارد حساب کاربری خود شوید'));
-        }
-
-        if (!payload || typeof payload !== 'object' || !('_id' in payload)) {
-          return reject(createHttpError.Unauthorized('اطلاعات توکن نامعتبر است'));
-        }
-
-        const { _id } = payload as JwtPayload;
-        const user = await UserModel.findById(_id, {
-          password: 0,
-          otp: 0,
-          resetLink: 0,
-        });
-
-        if (!user) {
-          return reject(createHttpError.Unauthorized('حساب کاربری یافت نشد'));
-        }
-
-        resolve(_id);
-      } catch (error) {
-        reject(createHttpError.Unauthorized('خطا در احراز هویت'));
-      }
+    const user = await UserModel.findById(payload._id, {
+      password: 0,
+      otp: 0,
+      resetLink: 0,
     });
-  });
+
+    if (!user) {
+      throw createHttpError.Unauthorized('حساب کاربری یافت نشد');
+    }
+
+    return payload._id;
+  } catch (err) {
+    throw createHttpError.Unauthorized('لطفا وارد حساب کاربری خود شوید');
+  }
 }
 
 export function toPersianDigits(n: string) {
