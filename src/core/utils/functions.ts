@@ -2,9 +2,10 @@ import nodemailer from 'nodemailer';
 import JWT, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Response, Request } from 'express';
-import { IUser } from '../types';
+import { INotification, IUser } from '../types';
 import createHttpError from 'http-errors';
 import { UserModel } from '@/modules/user/models/user';
+import { NotificationModel } from '@/modules/notification/models/notification';
 dotenv.config();
 
 export const transporter = nodemailer.createTransport({
@@ -133,3 +134,21 @@ export function deleteInvalidPropertyInObject<T extends Record<string, any>>(
 
   return data;
 }
+
+export const sendNotification = async ({
+  title,
+  message,
+  recipient,
+  type,
+  sender,
+  senderId,
+}: INotification) => {
+  return await NotificationModel.create({
+    title,
+    message,
+    recipient,
+    type,
+    sender,
+    senderId,
+  });
+};
