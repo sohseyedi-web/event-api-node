@@ -3,8 +3,12 @@ import { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import { IUser } from '../types';
 
+interface CustomRequest extends Request {
+  user?: IUser & Document;
+}
+
 export default function authorize(...allowedRoles: string[]) {
-  return async function (req: Request, res: Response, next: NextFunction) {
+  return async function (req: CustomRequest, res: Response, next: NextFunction) {
     try {
       if (!req.user?._id) {
         throw createHttpError.Unauthorized('کاربر احراز هویت نشده است');
