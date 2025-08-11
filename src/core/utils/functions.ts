@@ -94,3 +94,42 @@ export function generateRandomNumber(length: number) {
     return Math.floor(100000 + Math.random() * 900000);
   }
 }
+
+export function copyObject<T>(object: T): T {
+  return JSON.parse(JSON.stringify(object));
+}
+
+export function deleteInvalidPropertyInObject<T extends Record<string, any>>(
+  data: T = {} as T,
+  blackListFields: (keyof T)[] = []
+): Partial<T> {
+  const nullishData: (string | null | undefined)[] = ['', ' ', null, undefined];
+
+  Object.keys(data).forEach(key => {
+    const typedKey = key as keyof T;
+
+    if (blackListFields.includes(typedKey)) {
+      delete data[typedKey];
+      return;
+    }
+
+    if (typeof data[typedKey] === 'string') {
+      data[typedKey] = (data[typedKey] as string).trim() as T[keyof T];
+    }
+
+    if (Array.isArray(data[typedKey]) && data[typedKey].length > 0) {
+      data[typedKey] = (data[typedKey] as string[]).map(item => item.trim()) as T[keyof T];
+    }
+
+    if (Array.isArray(data[typedKey]) && data[typedKey].length === 0) {
+      delete data[typedKey];
+      return;
+    }
+
+    if (nullishData.includes(data[typedKey] as any)) {
+      delete data[typedKey];
+    }
+  });
+
+  return data;
+}
