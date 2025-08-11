@@ -135,7 +135,7 @@ export const addNewEvent = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { _id: ownerId, name } = req.user as { _id: Types.ObjectId; name: string };
+    const { _id: ownerId } = req.user as { _id: Types.ObjectId };
     const { filename, fileUploadPath, ...rest } = req.body;
     await addNewEventSchema.validate(rest);
 
