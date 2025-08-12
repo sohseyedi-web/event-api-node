@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 export interface INotification {
   title: string;
   message: string;
-  recipient: Types.ObjectId;
+  recipient?: Types.ObjectId;
   sender: string;
   senderId: Types.ObjectId;
   isRead?: boolean;
