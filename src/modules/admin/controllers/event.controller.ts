@@ -64,6 +64,8 @@ export const toggleEventOpenStatusByAdmin = async (
     }
 
     event.isOpen = true;
+    event.closeReason = reason;
+
     await event.save();
 
     await sendNotification({
