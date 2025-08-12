@@ -135,18 +135,14 @@ export function deleteInvalidPropertyInObject<T extends Record<string, any>>(
   return data;
 }
 
-export const sendNotification = async ({
-  title,
-  message,
-  recipient,
-  type,
-  sender,
-  senderId,
-}: INotification) => {
+export const sendNotification = async ({ ...rest }: INotification) => {
+  const admin = await UserModel.find({ role: 'ADMIN' }, '_id');
+  const { message, title, type, sender, senderId, recipient } = rest;
+
   return await NotificationModel.create({
     title,
     message,
-    recipient,
+    recipient: type === 'admin' ? admin[0]._id : recipient,
     type,
     sender,
     senderId,
