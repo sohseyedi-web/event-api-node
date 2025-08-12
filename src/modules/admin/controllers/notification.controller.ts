@@ -41,7 +41,7 @@ export const sendNotificationToUsersByAdmin = async (
     const { _id: adminId, role } = req.user;
     if (role !== 'ADMIN') throw createHttpError.Forbidden('دسترسی غیرمجاز');
 
-    const { receiverIds, title, message, type = 'admin-message' } = req.body;
+    const { receiverIds, title, message, type = 'system' } = req.body;
 
     if (!Array.isArray(receiverIds) || receiverIds.length === 0) {
       throw createHttpError.BadRequest('لیست کاربران الزامی است');
@@ -52,8 +52,9 @@ export const sendNotificationToUsersByAdmin = async (
     }
 
     const notifications = receiverIds.map(id => ({
-      receiver: id,
-      sender: adminId,
+      recipient: id,
+      senderId: adminId,
+      sender: 'ایونتیکت',
       title,
       message,
       type,
