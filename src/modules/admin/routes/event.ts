@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-router.get('/events', expressAsyncHandler(getAllEventsForAdmin as any));
-router.patch('/events/toggle/:id', expressAsyncHandler(toggleEventOpenStatusByAdmin as any));
+router.get('/', expressAsyncHandler(getAllEventsForAdmin as any));
+router.patch('/toggle/:id', expressAsyncHandler(toggleEventOpenStatusByAdmin as any));
 
 export default router;
