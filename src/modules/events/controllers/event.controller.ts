@@ -1,10 +1,14 @@
 import createHttpError from 'http-errors';
 import path from 'path';
 import { Request, Response, NextFunction } from 'express';
-import mongoose, { Types } from 'mongoose';
+import mongoose, { Types, Document } from 'mongoose';
 import { EventModel } from '../models/event';
-import { copyObject, deleteInvalidPropertyInObject } from '@/core/utils/functions';
-import { eventQuerySchema, addNewEventSchema, updateEventSchema } from '../validators/eventSchema';
+import {
+  copyObject,
+  deleteInvalidPropertyInObject,
+  sendNotification,
+} from '@/core/utils/functions';
+import { addNewEventSchema, updateEventSchema } from '../validators/eventSchema';
 import { IEvent, IAttendee, IUser } from '@/core/types';
 import { HTTP_STATUS } from '@/config/constants';
 
@@ -32,22 +36,27 @@ export const getAllEvents = async (
 ): Promise<void> => {
   try {
     const { _id: ownerId } = req.user as { _id: Types.ObjectId };
-    await eventQuerySchema.validate(req.body);
 
     let {
       search,
       sort,
       page = 1,
       limit = 6,
+      showAll = 'false',
     } = req.query as {
       search?: string;
       sort?: string;
       page?: number;
       limit?: number;
+      showAll?: string;
     };
 
     const skip = (page - 1) * limit;
     const dbQuery: Record<string, any> = { owner: ownerId };
+
+    if (showAll === 'false') {
+      dbQuery.isActive = true;
+    }
 
     if (search) {
       const searchTerm = new RegExp(search, 'ig');
@@ -72,7 +81,7 @@ export const getAllEvents = async (
     res.status(HTTP_STATUS.OK).json({
       statusCode: HTTP_STATUS.OK,
       data: {
-        message: events.length ? 'رویدادهای شما' : 'هیچ رویدادی برای نمایش وجود ندارد',
+        message: events.length ? 'لیست رویدادهای شما' : 'هیچ رویدادی برای نمایش وجود ندارد',
         events,
         pagination: {
           total,
@@ -149,6 +158,14 @@ export const addNewEvent = async (
       ...rest,
       thumbnail: fileAddress,
       owner: ownerId,
+    });
+
+    await sendNotification({
+      title: 'رویداد جدید ایجاد شد',
+      message: `کاربر ${req.user.name} یک رویداد جدید با عنوان "${event.title}" ایجاد کرده و منتظر تایید است.`,
+      type: 'admin',
+      sender: req.user.name,
+      senderId: req.user._id as any,
     });
 
     res.status(HTTP_STATUS.CREATED).json({
