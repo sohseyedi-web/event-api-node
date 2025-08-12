@@ -1,8 +1,10 @@
 import { HTTP_STATUS } from '@/config/constants';
 import { IUser } from '@/core/types';
+import { sendNotification } from '@/core/utils/functions';
 import { UserModel } from '@/modules/user/models/user';
 import { Request, Response, NextFunction } from 'express';
 import createHttpError from 'http-errors';
+import { Types } from 'mongoose';
 
 interface CustomRequest extends Request {
   user: IUser & Document;
@@ -29,9 +31,9 @@ export const getAllUsers = async (req: CustomRequest, res: Response): Promise<vo
   });
 };
 
-export const getUserDetailWithId = async (req: CustomRequest, res: Response): Promise<void> => {
-  const { phone } = req.params;
-  const user = await UserModel.findOne({ phoneNumber: phone });
+export const getUserDetailWithEmail = async (req: CustomRequest, res: Response): Promise<void> => {
+  const { email } = req.body;
+  const user = await UserModel.findOne({ email });
   res.status(HTTP_STATUS.OK).json({
     statusCode: HTTP_STATUS.OK,
     data: {
@@ -58,21 +60,42 @@ export const verifyUser = async (
 ): Promise<void> => {
   try {
     const { userId } = req.params;
-    const { isActive } = req.body;
+    const { _id: adminId } = req.user;
 
-    const user = await UserModel.findOneAndUpdate(
-      { _id: userId },
-      { $set: { isActive } },
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      throw createHttpError.NotFound('کاربر با این مشخصات یافت نشد');
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { $set: { isActive: !user.isActive } },
       { new: true }
     );
 
-    if (!user) throw createHttpError.NotFound('کاربر با این مشخصات یافت نشد');
+    const statusMessage = `حساب کاربری شما در حالت ${
+      updatedUser?.isActive ? 'فعال' : 'غیرفعال'
+    } قرار گرفت. ${
+      !updatedUser?.isActive
+        ? 'در صورت نیاز می‌توانید از طریق پشتیبانی دلیل این تغییر را جویا شوید.'
+        : ''
+    }`;
+
+    await sendNotification({
+      title: 'تغییر وضعیت حساب کاربری',
+      message: statusMessage,
+      type: 'system',
+      sender: 'ایونتیکت',
+      senderId: adminId as Types.ObjectId,
+      recipient: updatedUser?._id as Types.ObjectId,
+    });
 
     res.status(HTTP_STATUS.OK).json({
       statusCode: HTTP_STATUS.OK,
       data: {
-        message: `وضعیت کاربر به ${isActive ? 'فعال' : 'غیرفعال'} تغییر یافت`,
-        user,
+        message: `وضعیت کاربر به ${updatedUser?.isActive ? 'فعال' : 'غیرفعال'} تغییر یافت`,
+        user: updatedUser,
       },
     });
   } catch (error) {
