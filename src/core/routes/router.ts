@@ -1,6 +1,6 @@
 import express from 'express';
 import userAuthRoutes from '@/modules/user/routes/userAuth';
-import publicRoutes from '@/modules/user/routes/event';
+import publicRoutes from '@/modules/user/routes/public';
 import eventRoutes from '@/modules/events/routes/event';
 import notificationRouter from '@/modules/notification/routes/notification';
 import transactionRouter from '@/modules/transaction/routes/transaction';
