@@ -5,7 +5,7 @@ export interface INotification {
   message: string;
   recipient?: Types.ObjectId;
   sender: string;
-  senderId: Types.ObjectId;
+  senderId: Types.ObjectId | string;
   isRead?: boolean;
   type: 'admin' | 'event' | 'system' | 'ticket';
   createdAt?: Date;
