@@ -44,6 +44,22 @@ export const ownerProfileSchema = Joi.object({
     .required()
     .error(createHttpError.BadRequest('آدرس وارد شده صحیح نیست')),
 });
+export const supportProfileSchema = Joi.object({
+  faCity: Joi.string()
+    .pattern(/^[\u0600-\u06FF\s]+$/)
+    .required()
+    .error(createHttpError.BadRequest('نام شهر به صورت فارسی وارد شود')),
+
+  enCity: Joi.string()
+    .pattern(/^[A-Za-z\s]+$/)
+    .required()
+    .error(createHttpError.BadRequest('نام شهر به صورت انگلیسی وارد شود')),
+
+  address: Joi.string()
+    .min(1)
+    .required()
+    .error(createHttpError.BadRequest('آدرس وارد شده صحیح نیست')),
+});
 
 export const updateProfileSchema = Joi.object({
   name: Joi.string()
