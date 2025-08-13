@@ -74,8 +74,8 @@ export const getTicketById = async (
     }
 
     const ticket = await TicketModel.findById(ticketId)
-      .populate('owner', 'firstName lastName')
-      .populate('support', 'firstName lastName');
+      .populate('owner', 'name')
+      .populate('support', 'name');
 
     if (!ticket) {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'تیکت یافت نشد' });
