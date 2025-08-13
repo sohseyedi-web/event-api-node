@@ -4,6 +4,7 @@ export const ROLES = {
     USER: 'USER',
     ADMIN: 'ADMIN',
     OWNER: 'OWNER',
+    SUPPORT: 'SUPPORT',
   }),
 } as const;
 
