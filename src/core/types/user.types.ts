@@ -10,10 +10,11 @@ export interface IUser extends Document {
   faCity?: string;
   enCity?: string;
   email: string;
+  phoneNumber?: string;
   address?: string;
   otp: IOtp;
   isActive: boolean;
-  role: 'USER' | 'OWNER' | 'ADMIN';
+  role: 'USER' | 'OWNER' | 'ADMIN' | 'SUPPORT';
   createdAt: Date;
   updatedAt: Date;
 }
