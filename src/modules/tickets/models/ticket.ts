@@ -18,7 +18,7 @@ const TicketSchema = new Schema<ITicket>(
     status: {
       type: String,
       enum: ['open', 'pending', 'closed'],
-      default: 'open',
+      default: 'pending',
     },
     messages: [MessageSchema],
   },
