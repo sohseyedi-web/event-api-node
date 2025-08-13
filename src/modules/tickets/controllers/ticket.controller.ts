@@ -42,17 +42,49 @@ export const getMyTickets = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    let query = {};
-    if (req.user.role === 'SUPPORT') {
-      query = {};
-    } else {
-      query = { owner: req.user._id };
-    }
+    // ساپورت همه تیکت‌ها رو می‌بینه، کاربر فقط تیکت‌های خودش
+    const query = req.user.role === 'SUPPORT' ? {} : { owner: req.user._id };
 
-    const tickets = await TicketModel.find(query).sort({ createdAt: -1 });
+    const tickets = await TicketModel.find(query)
+      .populate('owner', 'firstName lastName')
+      .populate('support', 'firstName lastName')
+      .populate('messages.sender', 'firstName lastName')
+      .sort({ createdAt: -1 });
+
     res.status(HTTP_STATUS.OK).json({
       statusCode: HTTP_STATUS.OK,
       data: tickets,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTicketById = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { ticketId } = req.params;
+
+    if (!Types.ObjectId.isValid(ticketId)) {
+      res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'شناسه تیکت معتبر نیست' });
+      return;
+    }
+
+    const ticket = await TicketModel.findById(ticketId)
+      .populate('owner', 'firstName lastName')
+      .populate('support', 'firstName lastName');
+
+    if (!ticket) {
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'تیکت یافت نشد' });
+      return;
+    }
+
+    res.status(HTTP_STATUS.OK).json({
+      statusCode: HTTP_STATUS.OK,
+      data: ticket,
     });
   } catch (error) {
     next(error);
