@@ -46,3 +46,35 @@ export const emailStyleOtpVerification = async (email: string, otp: string) => {
     `,
   });
 };
+
+export const emailStyleJobRequest = async (email: string, firstName: string) => {
+  await transporter.sendMail({
+    to: email,
+    subject: '✅ درخواست استخدام شما ثبت شد',
+    html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f5f6fa; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h2 style="color: #2d3436; margin-bottom: 10px;">سلام ${firstName} عزیز،</h2>
+        <p style="font-size: 15px; color: #555; line-height: 1.7;">
+          درخواست استخدام شما با موفقیت دریافت شد و تیم ما در حال بررسی آن است.
+        </p>
+        <p style="font-size: 15px; color: #555; line-height: 1.7;">
+          نتیجه بررسی از طریق ایمیل یا تماس تلفنی به اطلاع شما خواهد رسید.
+        </p>
+        <p style="font-size: 15px; color: #555; line-height: 1.7;">
+          در صورت داشتن هرگونه سوال یا نیاز به اطلاعات بیشتر، می‌توانید از طریق ایمیل
+          <a href="mailto:support@example.com" style="color: #ff3c3c; text-decoration: none;">support@example.com</a>
+          یا شماره تماس
+          <span style="direction: ltr;">021-12345678</span>
+          با ما در ارتباط باشید.
+        </p>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+        <p style="font-size: 14px; color: #888;font-weight : bold">
+          با آرزوی موفقیت،<br>
+          تیم منابع انسانی
+        </p>
+      </div>
+    </div>
+    `,
+  });
+};
