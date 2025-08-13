@@ -9,6 +9,7 @@ import {
   userProfileSchema,
 } from '../validators/userSchema';
 import { IUser } from '@/core/types';
+import { supportProfileSchema } from './../validators/userSchema';
 
 interface CustomRequest extends Request {
   user: IUser & Document;
@@ -90,10 +91,14 @@ export const completeProfile = async (req: CustomRequest, res: Response) => {
 
   let updateData = {};
 
-  if (user.role !== 'OWNER') {
+  if (user.role === 'USER') {
     await userProfileSchema.validateAsync(req.body);
     const { name } = req.body;
     updateData = { name, isActive: true };
+  } else if (user.role === 'SUPPORT') {
+    await supportProfileSchema.validateAsync(req.body);
+    const { faCity, enCity, address } = req.body;
+    updateData = { faCity, enCity, address, isActive: true };
   } else {
     await ownerProfileSchema.validateAsync(req.body);
     const { name, faCity, enCity, address } = req.body;
