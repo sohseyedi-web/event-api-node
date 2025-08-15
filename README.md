@@ -134,36 +134,21 @@ The application uses Socket.IO for real-time messaging in the ticket support sys
 
 ### Installation
 
-1. 1. Clone the repository
+1. Clone the repository
 
 ```bash
 git clone https://github.com/sohseyedi-web/dexswap-lion
 ```
 
-2. 2. Install dependencies
+2. Install dependencies
 
 ```bash
 npm install
 ```
 
-- 3.  Create a .env file based on .env.example
-- 4.  Start the development server
+3. Create a .env file based on .env.example
+4. Start the development server
 
 ```bash
 npm run dev
 ```
-
-### Environment Variables
-
-APP_DB= # MongoDB connection string
-ACCESS_TOKEN_SECRET_KEY= # JWT access token secret
-REFRESH_TOKEN_SECRET_KEY= # JWT refresh token secret
-COOKIE_PARSER_SECRET_KEY= # Cookie parser secret
-TOKEN_SECRET_KEY= # General token secret
-CLIENT_URL= # Frontend URL
-SERVER_URL= # Backend URL
-NODE_ENV= # Environment (development/production)
-PORT= # Server port
-ALLOW_CORS_ORIGIN= # CORS allowed origins
-GMAIL_USER= # Gmail account for sending emails
-GMAIL_APP_PASSWORD= # Gmail app password
