@@ -63,24 +63,24 @@ This project is a RESTful API built with Express.js and MongoDB that provides fu
 ## Project Structure
 
 ├── src/
-│   ├── app.ts                 
-│   ├── config/                
-│   │   ├── constants.ts       
-│   │   └── db.ts              
-│   ├── core/                  
-│   │   ├── middleware/        
-│   │   ├── routes/            
-│   │   ├── types/             
-│   │   ├── uploads/           
-│   │   └── utils/             
-│   └── modules/               
-│       ├── admin/             
-│       ├── events/            
-│       ├── notification/      
-│       ├── support/           
-│       ├── tickets/           
-│       ├── transaction/       
-│       └── user/              
+│ ├── app.ts # Application entry point
+│ ├── config/ # Configuration files
+│ │ ├── constants.ts # Application constants
+│ │ └── db.ts # Database connection
+│ ├── core/ # Core functionality
+│ │ ├── middleware/ # Express middleware
+│ │ ├── routes/ # Main router
+│ │ ├── types/ # TypeScript interfaces
+│ │ ├── uploads/ # File upload directory
+│ │ └── utils/ # Utility functions
+│ └── modules/ # Feature modules
+│ ├── admin/ # Admin functionality
+│ ├── events/ # Event management
+│ ├── notification/ # Notification system
+│ ├── support/ # Support staff management
+│ ├── tickets/ # Ticket system
+│ ├── transaction/ # Payment processing
+│ └── user/ # User management            
 
 ## API Endpoints
 
