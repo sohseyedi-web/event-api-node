@@ -80,7 +80,7 @@ This project is a RESTful API built with Express.js and MongoDB that provides fu
 │ ├── support/ # Support staff management
 │ ├── tickets/ # Ticket system
 │ ├── transaction/ # Payment processing
-│ └── user/ # User management
+│ └── user/ # User management            
 
 ## API Endpoints
 
