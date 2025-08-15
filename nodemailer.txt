@@ -1,0 +1,71 @@
+Ticket API - Authentication System with Nodemailer
+
+Authentication System with OTP via Nodemailer
+The authentication system in this project uses OTP (One-Time Password) sent via email. It utilizes Gmail service and the Nodemailer library.
+
+Required Environment Variables
+
+GMAIL_USER=your-email@gmail.com  # Gmail account for sending emails
+GMAIL_APP_PASSWORD=your-app-password  # Application-specific password
+Guide to Set Up Gmail for Email Sending
+To use Gmail service for sending OTP emails, follow these steps:
+
+Enable Two-Factor Authentication:
+
+Log in to your Gmail account
+
+Go to Security settings
+
+Under "Signing in to Google", enable "2-Step Verification"
+
+Create an App Password:
+
+After enabling 2FA, go to App passwords
+
+Select "Mail" as the app and "Other" as the device
+
+Enter a name for your application (e.g., "Ticket API")
+
+Click "Generate" to get your 16-digit app password
+
+Configure Environment Variables:
+
+Set GMAIL_USER to your full Gmail address
+
+Set GMAIL_APP_PASSWORD to the generated app password (not your main Gmail password)
+
+Security Considerations:
+
+Never commit your actual credentials to version control
+
+Consider using a dedicated email account for sending application emails
+
+For production, consider using a professional SMTP service like SendGrid or Mailgun
+
+Implementation Details
+The authentication flow works as follows:
+
+User requests OTP by providing email (/api/v1/user/get-otp)
+
+System generates a 6-digit OTP and stores it with expiration time
+
+OTP is sent to user's email via Nodemailer
+
+User submits OTP for verification (/api/v1/user/check-otp)
+
+System validates OTP and issues JWT token upon success
+
+Troubleshooting
+If emails aren't being sent:
+
+Verify 2FA is enabled
+
+Confirm app password was generated correctly
+
+Check Gmail's SMTP server limits (500 emails/day for free accounts)
+
+Review server logs for error messages
+
+Test with less secure apps enabled (temporarily) if needed
+
+For production environments, we recommend migrating to a dedicated email service provider for better deliverability and higher sending limits.
